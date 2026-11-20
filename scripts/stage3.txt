@@ -1,0 +1,9 @@
+# Загрузка CSV и проверка пользовательского диалога
+vfsinfo
+ls
+cd /
+ls "path with spaces"
+unknown-command
+ls 'незакрытая кавычка
+vfsinfo
+exit

@@ -1,0 +1,8 @@
+path,type,content
+/a/b/c/hello world.txt,file,U3BhY2UgaW4gdGhlIG5hbWUK
+/a/b/c/empty,dir,
+/a,dir,
+/a/b,dir,
+/other/nested/empty,dir,
+/path with spaces/hello world.txt,file,SGVsbG8sIFZGUyEK
+/path with spaces,dir,

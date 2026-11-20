@@ -7,21 +7,23 @@ from typing import TextIO
 
 from src.errors import ShellError
 from src.parser import parse_line
+from src.vfs import Vfs
 
 
 class Shell:
-    """Минимальный прототип оболочки."""
+    """Оболочка с виртуальной файловой системой в памяти."""
 
-    def __init__(self, output: TextIO | None = None):
-        """Создаёт оболочку с выводом в консоль по умолчанию."""
+    def __init__(self, output: TextIO | None = None, vfs: Vfs | None = None):
+        """Создаёт оболочку с выводом и файловой системой по умолчанию."""
         self.output = output if output is not None else sys.stdout
+        self.vfs = vfs if vfs is not None else Vfs()
         self.running = True
         self.user = getpass.getuser()
         self.host = socket.gethostname()
 
     def prompt(self) -> str:
-        """Формирует приглашение из настоящего пользователя и имени узла."""
-        return f"{self.user}@{self.host}:~$ "
+        """Формирует приглашение из данных ОС и текущего каталога VFS."""
+        return f"{self.user}@{self.host}:{self.vfs.cwd_path()}$ "
 
     def write(self, text: str) -> None:
         """Выводит непустой результат с завершающим переводом строки."""
@@ -40,16 +42,34 @@ class Shell:
             return False
 
     def dispatch(self, words: list[str]) -> None:
-        """Вызывает заглушку, выход или сообщает о неизвестной команде."""
+        """Вызывает заглушку, служебную команду или выход."""
         command, args = words[0], words[1:]
         if command in ("ls", "cd"):
             self.write(f"{command}: {args}")
+        elif command == "vfsinfo":
+            if args:
+                raise ShellError("vfsinfo: лишние аргументы")
+            self.write(self.vfs_info())
         elif command == "exit":
             if args:
                 raise ShellError("exit: лишние аргументы")
             self.running = False
         else:
             raise ShellError(f"{command}: command not found")
+
+    def vfs_info(self) -> str:
+        """Возвращает имя VFS и число файлов и папок в памяти."""
+        folders = files = 0
+        stack = [self.vfs.root]
+        while stack:
+            node = stack.pop()
+            for child in node.children.values():
+                if child.is_dir:
+                    folders += 1
+                    stack.append(child)
+                else:
+                    files += 1
+        return f"VFS: {self.vfs.name}, папок: {folders}, файлов: {files}"
 
     def run(self, input_stream: TextIO | None = None) -> None:
         """Читает команды до exit или конца ввода."""
@@ -60,7 +80,7 @@ class Shell:
             try:
                 line = stream.readline()
             except KeyboardInterrupt:
-                self.write("")
+                self.output.write("\n")
                 continue
             if not line:
                 self.output.write("\n")
