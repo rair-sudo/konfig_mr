@@ -1,0 +1,9 @@
+# Кавычки, заглушки и продолжение после ошибок
+ls "two words"
+cd '/path with spaces'
+unknown-command
+ls 'незакрытая кавычка
+cd /
+exit invalid
+ls after-errors
+exit
