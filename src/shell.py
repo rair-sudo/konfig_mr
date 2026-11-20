@@ -7,6 +7,7 @@ from typing import TextIO
 
 from src.commands import cal, cd, head, ls
 from src.errors import ShellError
+from src.mutations import mv, rmdir
 from src.parser import parse_line
 from src.vfs import Vfs
 
@@ -21,7 +22,10 @@ class Shell:
         self.running = True
         self.user = getpass.getuser()
         self.host = socket.gethostname()
-        self.commands = {"ls": ls, "cd": cd, "head": head, "cal": cal}
+        self.commands = {
+            "ls": ls, "cd": cd, "head": head, "cal": cal,
+            "rmdir": rmdir, "mv": mv,
+        }
 
     def prompt(self) -> str:
         """Формирует приглашение из данных ОС и текущего каталога VFS."""

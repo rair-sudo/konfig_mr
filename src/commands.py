@@ -9,6 +9,14 @@ from datetime import date
 
 from src.errors import ShellError
 
+SINGLE_OPERAND = 1
+MONTH_YEAR_OPERANDS = 2
+FIRST_YEAR = 1
+LAST_YEAR = 9999
+FIRST_MONTH = 1
+LAST_MONTH = 12
+DEFAULT_HEAD_LINES = 10
+
 
 def _ls_options(args: list[str]) -> tuple[bool, bool, list[str]]:
     """Разбирает комбинированные флаги ls и пути после --."""
@@ -78,7 +86,7 @@ def ls(vfs, args: list[str]) -> str:
     for path, node in directories:
         entries = _directory_entries(vfs, path, node, show_all)
         lines = _ls_lines(entries, long_format)
-        if len(paths) > 1:
+        if len(paths) > SINGLE_OPERAND:
             lines.insert(0, f"{path}:")
         sections.append("\n".join(lines))
     result = "\n\n".join(section for section in sections if section)
@@ -89,7 +97,7 @@ def cd(vfs, args: list[str]) -> str:
     """Меняет рабочий каталог; без аргументов переходит в корень."""
     if args[:1] == ["--"]:
         args = args[1:]
-    if len(args) > 1:
+    if len(args) > SINGLE_OPERAND:
         raise ShellError("too many arguments")
     path = args[0] if args else "/"
     node = vfs.find(path)
@@ -120,7 +128,7 @@ def _head_option(args: list[str], index: int) -> tuple[int, bool, int]:
             raise ShellError("option requires an argument -- 'n'")
         count, exclude = _head_count(args[index])
         return count, exclude, index
-    if arg.startswith("-n") and len(arg) > 2:
+    if arg.startswith("-n"):
         count, exclude = _head_count(arg[2:])
         return count, exclude, index
     raise ShellError(f"invalid option: '{arg}'")
@@ -128,7 +136,7 @@ def _head_option(args: list[str], index: int) -> tuple[int, bool, int]:
 
 def _head_options(args: list[str]) -> tuple[int, bool, list[str]]:
     """Разбирает -n N, -nN и пути, отделяемые через --."""
-    count, exclude = 10, False
+    count, exclude = DEFAULT_HEAD_LINES, False
     paths = []
     options = True
     index = 0
@@ -167,15 +175,16 @@ def head(vfs, args: list[str]) -> str:
         if node.is_dir:
             raise ShellError(f"'{path}': Is a directory")
         text = _head_content(node.content, count, exclude)
-        if len(paths) > 1:
+        if len(paths) > SINGLE_OPERAND:
             text = f"==> {path} <==\n" + text
         sections.append(text)
-    return "\n".join(sections) if len(paths) > 1 else sections[0]
+    multiple = len(paths) > SINGLE_OPERAND
+    return "\n".join(sections) if multiple else sections[0]
 
 
 def _calendar_numbers(args: list[str]) -> tuple[int | None, int]:
     """Проверяет MONTH YEAR или YEAR; допустимые годы от 1 до 9999."""
-    if len(args) > 2:
+    if len(args) > MONTH_YEAR_OPERANDS:
         raise ShellError("expected [MONTH] YEAR")
     if not args:
         today = date.today()
@@ -184,11 +193,11 @@ def _calendar_numbers(args: list[str]) -> tuple[int | None, int]:
         numbers = [int(arg) for arg in args]
     except ValueError as exc:
         raise ShellError("month and year must be integers") from exc
-    month, year = (numbers[0], numbers[1]) if len(numbers) == 2 else (
-        None, numbers[0])
-    if not 1 <= year <= 9999:
+    has_month = len(numbers) == MONTH_YEAR_OPERANDS
+    month, year = (numbers[0], numbers[1]) if has_month else (None, numbers[0])
+    if not FIRST_YEAR <= year <= LAST_YEAR:
         raise ShellError("year must be between 1 and 9999")
-    if month is not None and not 1 <= month <= 12:
+    if month is not None and not FIRST_MONTH <= month <= LAST_MONTH:
         raise ShellError("month must be between 1 and 12")
     return month, year
 

@@ -1,0 +1,29 @@
+# Перемещение файлов и каталогов; удаление только пустых папок
+vfsinfo
+ls -l /
+rmdir /a/b/c/empty /other/nested/empty
+mv "/path with spaces/hello world.txt" "/path with spaces/renamed.txt"
+head "/path with spaces/renamed.txt"
+mv "/path with spaces/renamed.txt" "/a/b/c/hello world.txt" /other/nested
+ls -l /other/nested
+head /other/nested/renamed.txt /other/nested/"hello world.txt"
+rmdir "/path with spaces"
+mv /a /other
+cd /other/a/b/c
+mv /other/a /moved
+ls /moved
+cd /
+# Ошибочные строки не останавливают последующие команды
+rmdir /other/nested
+rmdir /missing
+rmdir /
+rmdir
+mv /moved /moved/b
+mv /missing /new
+mv /other/nested/renamed.txt /other/nested/renamed.txt
+mv
+mv /other/nested/renamed.txt/../hello /bad
+ls /moved
+vfsinfo
+exit extra
+exit

@@ -1,0 +1,33 @@
+Конфигурация: --vfs=vfs/deep.csv, --script=не задан
+root@35b07c6c8142:/$ vfsinfo
+VFS: deep.csv, папок: 8, файлов: 2
+root@35b07c6c8142:/$ ls -al
+d      3 .
+d      3 ..
+d      1 a
+d      1 other
+d      1 path with spaces
+root@35b07c6c8142:/$ cd "/path with spaces"
+root@35b07c6c8142:/path with spaces$ head -n 1 "hello world.txt"
+Hello, VFS!
+root@35b07c6c8142:/path with spaces$ cal 2 2024
+   February 2024
+Su Mo Tu We Th Fr Sa
+             1  2  3
+ 4  5  6  7  8  9 10
+11 12 13 14 15 16 17
+18 19 20 21 22 23 24
+25 26 27 28 29
+root@35b07c6c8142:/path with spaces$ mv "hello world.txt" renamed.txt
+root@35b07c6c8142:/path with spaces$ ls
+renamed.txt
+root@35b07c6c8142:/path with spaces$ rmdir /a/b/c/empty
+root@35b07c6c8142:/path with spaces$ cd /missing
+cd: No such file or directory: '/missing' (path '/missing')
+root@35b07c6c8142:/path with spaces$ no-such-command
+no-such-command: command not found
+root@35b07c6c8142:/path with spaces$ ls 'unclosed
+синтаксическая ошибка: No closing quotation
+root@35b07c6c8142:/path with spaces$ exit extra
+exit: лишние аргументы
+root@35b07c6c8142:/path with spaces$ exit
