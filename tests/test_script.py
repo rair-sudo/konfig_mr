@@ -8,6 +8,7 @@ from pathlib import Path
 from src.config import Config, describe, parse_args
 from src.script import run_script
 from src.shell import Shell
+from src.vfs import Node
 
 
 class ConfigTests(unittest.TestCase):
@@ -37,6 +38,7 @@ class ScriptTests(unittest.TestCase):
             path.write_text("badcmd\nls 'a b'\nexit\n", encoding="utf-8")
             output = io.StringIO()
             shell = Shell(output)
+            shell.vfs.root.children["a b"] = Node("a b", False)
             self.assertFalse(run_script(shell, str(path)))
             self.assertIn("badcmd", output.getvalue())
             self.assertIn(":1: ошибка", output.getvalue())

@@ -1,0 +1,31 @@
+# Демонстрация основных команд и продолжения после ошибок
+vfsinfo
+ls
+ls -a
+ls -l /a "/path with spaces"
+cd /a/b/c
+ls
+head "hello world.txt"
+head -n 1 "hello world.txt"
+head -n0 "hello world.txt"
+head -n -1 "hello world.txt"
+head "/path with spaces/hello world.txt" "hello world.txt"
+cd ..
+ls c
+cd /
+cal
+cal 2 2024
+cal 2024
+ls -z
+ls /missing
+cd /missing
+cd "/path with spaces/hello world.txt"
+head
+head -n nope "/path with spaces/hello world.txt"
+head /a
+cal 13 2024
+unknown-command
+ls 'незакрытая кавычка
+ls /a
+exit extra
+exit

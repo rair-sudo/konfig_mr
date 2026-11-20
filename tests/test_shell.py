@@ -6,6 +6,7 @@ import unittest
 from src.errors import ShellError
 from src.parser import parse_line
 from src.shell import Shell
+from src.vfs import Node
 
 
 class ParserTests(unittest.TestCase):
@@ -37,8 +38,9 @@ class ShellTests(unittest.TestCase):
         self.assertIn(self.shell.host, prompt)
         self.assertTrue(prompt.endswith("$ "))
 
-    def test_stub_quotes_and_errors(self):
-        """Заглушки печатают аргументы, а ошибки не закрывают оболочку."""
+    def test_quoted_paths_and_errors(self):
+        """Кавычки сохраняют имя файла, а ошибки не закрывают оболочку."""
+        self.shell.vfs.root.children["two words"] = Node("two words", False)
         self.assertTrue(self.shell.execute('ls "two words"'))
         self.assertIn("two words", self.output.getvalue())
         self.assertFalse(self.shell.execute("unknown"))
